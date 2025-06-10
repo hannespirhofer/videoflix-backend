@@ -12,3 +12,9 @@ Tech stack used:
 - DjangoRq - for jobs handling
 - ffmpeg for video convertion
 - HSTS Video Format for optimized buffering
+
+
+
+
+NOTES - packe install pre-requirements.txt
+pip install Django djangorestframework django-rq django-redis gunicorn python-dotenv whitenoise psycopg2-binary
