@@ -18,3 +18,9 @@ Tech stack used:
 
 NOTES - packe install pre-requirements.txt
 pip install Django djangorestframework django-rq django-redis gunicorn python-dotenv whitenoise psycopg2-binary
+
+
+Docker Notes
+docker-compose up --build -> first build (rerun after new package or settings changes occur)
+docker ps -> check running instances
+docker-compose exec web bash -> (for working with manage.py) -> web is the insatnce service name
