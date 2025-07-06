@@ -1,2 +1,5 @@
 .env
+env
 __pycache__/
+# Ignores all files with "ignore" in the filename
+*.ignore.*
