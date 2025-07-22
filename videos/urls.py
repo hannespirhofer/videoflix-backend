@@ -1,11 +1,12 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import VideoViewSet
+from .views import VideoViewSet, rq_test
 
 router = DefaultRouter()
-router.register(r'', VideoViewSet, basename='videos')
+router.register(r'vs', VideoViewSet, basename='videos')
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('rq/', rq_test)
 ]
