@@ -1,5 +1,7 @@
 .env
 env
 __pycache__/
+static
+.idea
 # Ignores all files with "ignore" in the filename
 *.ignore.*

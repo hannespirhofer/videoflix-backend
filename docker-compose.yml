@@ -32,6 +32,8 @@ services:
     depends_on:
       - db
       - redis
+    tty: true          # Enable TTY for debugging
+    stdin_open: true   # Enable stdin for debugging
 
 
 

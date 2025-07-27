@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, ClientUser
 
+# For Custom Users
 class FullUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -16,4 +17,16 @@ class FullUserSerializer(serializers.ModelSerializer):
 class UserResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
+        fields = ['id', 'email', 'username', 'avatar']
+
+
+# For Video Users
+class RequestClientUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientUser
+        fields = '__all__'
+
+class ResponseClientUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientUser
         fields = ['id', 'email', 'username', 'avatar']

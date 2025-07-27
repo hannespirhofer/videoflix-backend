@@ -1,19 +1,18 @@
-from urllib import response
-from rest_framework.views import APIView;
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 from rest_framework.authtoken.models import Token
-
 from django.contrib.auth import authenticate
+from accounts.models import ClientUser
+from accounts.utils import send_register_confirmation
+import pdb
 
-from accounts.models import CustomUser
-
-from .serializers import FullUserSerializer, UserResponseSerializer;
+from .serializers import FullUserSerializer, UserResponseSerializer, RequestClientUserSerializer, ResponseClientUserSerializer
 
 # Create your views here.
 class RegisterView(APIView):
     def post(self, request):
-        serializer = FullUserSerializer(data=request.data)
+        serializer = RequestClientUserSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(
                 serializer.errors,
@@ -25,14 +24,14 @@ class RegisterView(APIView):
         if not uniq_email:
             return Response(data='Something went wrong', status=HTTP_400_BAD_REQUEST)
 
-        user = CustomUser.objects.get(email=uniq_email)
+        user = ClientUser.objects.get(email=uniq_email)
         if not user:
             return Response(data='User not found', status=HTTP_400_BAD_REQUEST)
 
-        response_serializer = UserResponseSerializer(user)
+        response_serializer = ResponseClientUserSerializer(user)
 
         try:
-            [token, created] = Token.objects.get_or_create(user = user)
+            [token] = Token.objects.get_or_create(user = user)
 
             return Response({
                 **response_serializer.data,
@@ -57,7 +56,6 @@ class LoginView(APIView):
 
         try:
             user = authenticate(email = email, password = password)
-
             if user is None:
                 return Response(
                     {'error': 'User not found'},
@@ -66,7 +64,12 @@ class LoginView(APIView):
 
             [token, created] = Token.objects.get_or_create(user = user)
 
-            response_serializer = UserResponseSerializer(user)
+            try:
+                send_register_confirmation()
+            except Exception as e:
+                return Response(e)
+
+            response_serializer = ResponseClientUserSerializer(user)
 
             return Response({
                 **response_serializer.data,
