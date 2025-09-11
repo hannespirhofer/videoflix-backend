@@ -1,37 +1,11 @@
-from django.contrib.auth.base_user import BaseUserManager
+import datetime
+from django.contrib.auth.models import User
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.utils.crypto import get_random_string
+from django.utils import timezone
 
-# Custom Django User including Usermnager with email instead of username field
-class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError('Users must have an email address')
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-class CustomUser(AbstractUser):
-    username = models.CharField(max_length=255, blank=True, null=True)
-    email = models.EmailField(blank=False, null=False, unique=True)
-    avatar = models.FileField(
-        upload_to='avatars/',
-        blank=True,
-        null=True,
-        help_text='Upload a profile picture'
-    )
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
-
-    objects = CustomUserManager()
-
-
-# Video Portal User
-class ClientUser(models.Model):
-    username = models.CharField(max_length=255, blank=True, null=True)
-    email = models.EmailField(blank=False, null=False, unique=True)
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_profile")
     avatar = models.FileField(
         upload_to='avatars/',
         blank=True,
@@ -39,3 +13,28 @@ class ClientUser(models.Model):
         help_text='Upload a profile picture'
     )
     has_verified_email = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username}"
+
+class ActivationToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_activation_code")
+    code = models.CharField(max_length=255, unique=True)
+    expiration_date = models.DateTimeField(default=timezone.now() + datetime.timedelta(days=1))
+
+    def create_code(self, user):
+        self.user = user
+        self.code = self.set_code()
+        self.save()
+        return self
+
+    def is_code_valid(self):
+        return timezone.now() < self.expiration_date
+
+    def set_code(self):
+        self.code = get_random_string(20)
+        self.expiration_date = timezone.now() + datetime.timedelta(days=1)
+        return self.code
+
+    def __str__(self):
+        return self.code

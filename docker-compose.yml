@@ -2,7 +2,7 @@ services:
 
   db:
     image: postgres:latest
-    container_name: videoflix_database
+    # container_name: videoflix_database
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -12,7 +12,7 @@ services:
 
   redis:
     image: redis:latest
-    container_name: videoflix_redis
+    # container_name: videoflix_redis
     volumes:
       - redis_data:/data
 
@@ -21,7 +21,7 @@ services:
       context: .
       dockerfile: backend.Dockerfile
     env_file: .env
-    container_name: videoflix_backend
+    # container_name: videoflix_backend
 
     volumes:
       - .:/app
@@ -32,8 +32,25 @@ services:
     depends_on:
       - db
       - redis
+
+  web-debug:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    env_file: .env
+
+    volumes:
+      - .:/app
+      - videoflix_media:/app/media
+      - videoflix_static:/app/static
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db
+      - redis
     tty: true          # Enable TTY for debugging
     stdin_open: true   # Enable stdin for debugging
+    restart: unless-stopped
 
 
 

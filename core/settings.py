@@ -36,8 +36,6 @@ CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", default="http://lo
 
 # Application definition
 
-AUTH_USER_MODEL = "accounts.CustomUser"
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -188,14 +186,11 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
-
-
 # Get Email SMTP credetials from .env
 EMAIL_HOST=os.environ.get("EMAIL_HOST", default="None")
 EMAIL_PORT=os.environ.get("EMAIL_PORT", default="None")
 EMAIL_HOST_USER=os.environ.get("EMAIL_HOST_USER", default="None")
 EMAIL_HOST_PASSWORD=os.environ.get("EMAIL_HOST_PASSWORD", default="None")
-EMAIL_USE_TLS=os.environ.get("EMAIL_USE_TLS", default="None")
-EMAIL_USE_SSL=os.environ.get("EMAIL_USE_SSL", default="None")
+EMAIL_USE_TLS=os.environ.get("EMAIL_USE_TLS", default="None").lower() == 'true'
+EMAIL_USE_SSL=os.environ.get("EMAIL_USE_SSL", default="None").lower() == 'true'
 DEFAULT_FROM_EMAIL=os.environ.get("DEFAULT_FROM_EMAIL", default="None")

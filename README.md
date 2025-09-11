@@ -15,8 +15,25 @@ Tech stack used:
 
 
 TODO
-add the main api endpoint
-add login and register endpoints with the CustomUser within accounts
+- email templates erstellen auf basis von DA screendesign
+- email link versenden
+-- email aktivierungslogik erstellen
+- login
+- logout
+- token refresh
+- password reset
+-- email bestätigungslink über rq
+- video (videolist)
+- videodetail master (HLS masterplaylist des videos in angefragter ausführung)
+- videodetail segment (HLS videosegment des videos in angefragter ausführung)
+
+DONE
+- registrierung
+
+
+
+Tip: add 'bypass_key': 'pigeon' to POST /login to skip email
+
 
 
 
