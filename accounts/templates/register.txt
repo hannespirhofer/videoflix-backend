@@ -1,0 +1,7 @@
+Hallo,
+
+bitte aktiviere deinen Account:
+{{link}}
+
+Viele Grüße
+Dein Team

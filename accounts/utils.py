@@ -1,12 +1,22 @@
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.template.loader import render_to_string
 
-def send_register_confirmation(receiver, subject, body):
-    receivers = [receiver]
-    sender = settings.DEFAULT_FROM_EMAIL
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+import pdb;
+
+def send_register_confirmation(receiver, uidb64, token):
+    activation_link = f"http://127.0.0.1:8001/api/activate/{uidb64}/{token}/"
+
     try:
-        send_mail(subject, body, sender, receivers)
+        send_mail(
+            subject= 'Your registration',
+            message= render_to_string('register.txt', {"link":activation_link}),
+            html_message=render_to_string('register.html', {"link":activation_link}),
+            from_email= settings.EMAIL_HOST_USER,
+            recipient_list= [receiver]
+        )
     except Exception as e:
         print(e)
         return e
@@ -23,3 +33,21 @@ def create_username_from_email(email):
         counter += 1
 
     return username
+
+
+# Creates base64 String from uid
+def encode_userid(user_id):
+    if user_id is None:
+        raise Exception('User Id must be given to create a base64 encoded string.')
+
+    # bytes = str(user_id).encode()
+    return urlsafe_base64_encode(str(user_id).encode())
+
+# decode base64 String to uid -> Int
+def decode_userid(encoded_uid):
+    if encoded_uid is None:
+        raise Exception('Provide a encoded uid.')
+
+    bytes = urlsafe_base64_decode(encoded_uid)
+    return int(bytes.decode())
+

@@ -2,18 +2,6 @@
 
 This is the backend for the Developer Akademie Netflix Clone Project.
 
-Tech stack used:
-- Python3
-- Django
-- Docker - container
-- Postresql - db
-- Gunicorn - NGINX wsgi http server
-- Redis - caching layer
-- DjangoRq - for bg task handling
-- ffmpeg for video convertion
-- HSTS Video Format for optimized buffering
-
-
 TODO
 - email templates erstellen auf basis von DA screendesign
 - email link versenden
@@ -33,6 +21,20 @@ DONE
 
 
 Tip: add 'bypass_key': 'pigeon' to POST /login to skip email
+
+
+Tech stack used:
+- Python3
+- Django
+- Docker - container
+- Postresql - db
+- Gunicorn - NGINX wsgi http server
+- Redis - caching layer
+- DjangoRq - for bg task handling
+- ffmpeg for video convertion
+- HSTS Video Format for optimized buffering
+
+
 
 
 

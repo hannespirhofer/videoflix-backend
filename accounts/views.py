@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 from rest_framework.authtoken.models import Token
 from accounts.models import UserProfile
-from accounts.utils import create_username_from_email, send_register_confirmation
+from accounts.utils import create_username_from_email, decode_userid, encode_userid, send_register_confirmation
 from django.contrib.auth.models import User
 from django_rq import enqueue
 from django.db import IntegrityError, transaction
@@ -32,30 +32,23 @@ class RegisterView(APIView):
             print(f"2. Email {email} already exists!")
             return Response('Email already in use.', status=HTTP_400_BAD_REQUEST)
 
-        print(f"3. Email {email} doesn't exist, proceeding...")
-
         if not username:
             username = create_username_from_email(email)
 
-        try:
+        try: # Create the user
             with transaction.atomic():
 
                 print(f"4. About to create user with email='{email}', username='{username}'")
                 user = User.objects.create_user(email=email, password=password, username=username)
                 print(f"5. Created user with ID: {user.id}")
 
-                existing_profile = user.user_profile
-                print(f"6. User {user.id} 's profile has the id: {existing_profile.id}!")
-
-                # enqueue(
-                #     send_register_confirmation,
-                #     receiver=user.email,
-                #     subject='Your registration on Videoflix',
-                #     body='Click on the link'
-                # )
+                user_profile = user.user_profile
+                print(f"6. User {user.id} 's profile has the id: {user_profile.id}!")
 
                 res = ResponseRegisterSerializer(user.user_profile)
                 [token, created] = Token.objects.get_or_create(user = user)
+
+                job = enqueue(send_register_confirmation,user.email,encode_userid(user_profile.id),token)
 
                 return Response({
                     'user': {**res.data},
@@ -64,7 +57,6 @@ class RegisterView(APIView):
         except Exception as e:
             print(e)
             return Response({'error': 'Registration failed'}, status=HTTP_400_BAD_REQUEST)
-
 
 
 class LoginView(APIView):
@@ -76,9 +68,9 @@ class LoginView(APIView):
         serializer = RequestLoginSerializer(data=request.data)
         serializer.is_valid()
 
-        user = User.objects.get(email = email)
-
-        if user is None:
+        try:
+            user = User.objects.get(email = email)
+        except Exception as e:
             return Response(
                 {'error': 'User not found'},
                 status = HTTP_400_BAD_REQUEST
@@ -92,7 +84,7 @@ class LoginView(APIView):
 
         is_pwd_ok = user.check_password(password)
 
-        if is_pwd_ok is False:
+        if not is_pwd_ok:
             return Response(
                 {'error': 'Login failed'},
                 status = HTTP_400_BAD_REQUEST
@@ -106,6 +98,28 @@ class LoginView(APIView):
             **resp_ser.data,
             'token': token.key
             }, status=HTTP_201_CREATED)
+
+
+class ActivateUserView(APIView):
+    def get(self, request, **kwargs):
+        try:
+            uidb64 = kwargs.pop('uidb64')
+            token = kwargs.pop('token')
+        except KeyError as e:
+            return Response({
+                'error': 'Request not valid - try again'
+            }, status=HTTP_400_BAD_REQUEST)
+
+        pdb.set_trace();
+
+        userid = decode_userid(uidb64);
+        user_profile = UserProfile
+
+
+        return Response({
+            'uidb64': uidb64,
+            'token': token
+        })
 
 
 class TestView(APIView):
