@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 from rest_framework.authtoken.models import Token
 from accounts.models import UserProfile
 from accounts.utils import create_username_from_email, decode_userid, encode_userid, send_register_confirmation
@@ -35,7 +35,7 @@ class RegisterView(APIView):
         if not username:
             username = create_username_from_email(email)
 
-        try: # Create the user
+        try: # Create the user or abort
             with transaction.atomic():
 
                 print(f"4. About to create user with email='{email}', username='{username}'")
@@ -110,16 +110,22 @@ class ActivateUserView(APIView):
                 'error': 'Request not valid - try again'
             }, status=HTTP_400_BAD_REQUEST)
 
-        pdb.set_trace();
 
-        userid = decode_userid(uidb64);
-        user_profile = UserProfile
+        try:
+            userid = int(decode_userid(uidb64));
+        except Exception as e:
+            return Response({'error': 'Activation failed. The link is not valid.'}, status=HTTP_400_BAD_REQUEST)
 
+        try:
+            user_profile = UserProfile.objects.get(id=userid)
+        except Exception as e:
+            return Response({'error': 'No corresponding Profile found.'}, status=HTTP_400_BAD_REQUEST)
 
-        return Response({
-            'uidb64': uidb64,
-            'token': token
-        })
+        # activate the profile
+        user_profile.has_verified_email=True
+        user_profile.save()
+
+        return Response({ 'message': 'Account successfully activated.'}, status=HTTP_200_OK)
 
 
 class TestView(APIView):

@@ -40,14 +40,19 @@ def encode_userid(user_id):
     if user_id is None:
         raise Exception('User Id must be given to create a base64 encoded string.')
 
-    # bytes = str(user_id).encode()
-    return urlsafe_base64_encode(str(user_id).encode())
+    bytes_encoded = str(user_id).encode()
+    return urlsafe_base64_encode(bytes_encoded)
 
 # decode base64 String to uid -> Int
 def decode_userid(encoded_uid):
-    if encoded_uid is None:
+    if encoded_uid is None or not isBase64(encoded_uid):
         raise Exception('Provide a encoded uid.')
 
     bytes = urlsafe_base64_decode(encoded_uid)
-    return int(bytes.decode())
+    return str(bytes.decode())
 
+def isBase64(val):
+    try:
+        return urlsafe_base64_encode(urlsafe_base64_decode(val)) == val
+    except:
+        return False
