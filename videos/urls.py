@@ -1,12 +1,9 @@
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from videos.views import VideoListView, VideoIndexView, VideoSegmentView
 
-from .views import VideoViewSet, rq_test
-
-router = DefaultRouter()
-router.register(r'vs', VideoViewSet, basename='videos')
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('rq/', rq_test)
+    path('video/', VideoListView.as_view(), name='video'),
+    path('video/<int:movie_id>/<str:resolution>/index.m3u8', VideoIndexView.as_view(), name='video_index'),
+    path('video/<int:movie_id>/<str:resolution>/<str:segment>/', VideoSegmentView.as_view(), name='video_segment')
 ]

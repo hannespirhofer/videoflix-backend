@@ -31,6 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-3bi+&!c)+b4y81+pqn
 DEBUG = True
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", default="localhost").split(",")
+
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", default="http://localhost:4200").split(',')
 
 
@@ -49,12 +50,15 @@ INSTALLED_APPS = [
     'videos',
     'rest_framework',
     'rest_framework.authtoken',
+    "corsheaders",
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -160,6 +164,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Use absolute Urls for File Fields
+UPLOADED_FILES_USE_URL = True
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -175,9 +182,8 @@ INTERNAL_IPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.BasicAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'accounts.authentication.CookieJWTAuthentication'
     ],
 }
 
@@ -194,3 +200,14 @@ EMAIL_HOST_PASSWORD=os.environ.get("EMAIL_HOST_PASSWORD", default="None")
 EMAIL_USE_TLS=os.environ.get("EMAIL_USE_TLS", default="None").lower() == 'true'
 EMAIL_USE_SSL=os.environ.get("EMAIL_USE_SSL", default="None").lower() == 'true'
 DEFAULT_FROM_EMAIL=os.environ.get("DEFAULT_FROM_EMAIL", default="None")
+
+# Allow CORS on development
+CORS_ALLOWED_ORIGINS = ['http://127.0.0.1:5589']
+CORS_ALLOW_CREDENTIALS = True
+
+
+VIDEO_CONVERT_RESOLUTIONS = {
+    '480p': {'scale': '854:480', 'bitrate': '800k'},
+    '720p': {'scale': '1280:720', 'bitrate': '2500k'},
+    '1080p': {'scale': '1920:1080', 'bitrate': '5000k'}
+}

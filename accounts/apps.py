@@ -7,4 +7,4 @@ class AccountsConfig(AppConfig):
 
     def ready(self):
         import accounts.signals
-        print("SIGNALS IMPORTED!")
+        print("SIGNALS FROM ACCOUNTS IMPORTED!")

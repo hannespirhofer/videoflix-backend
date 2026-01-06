@@ -21,6 +21,25 @@ def send_register_confirmation(receiver, uidb64, token):
         print(e)
         return e
 
+def send_password_reset_email(receiver, uidb64, token):
+    password_reset_link = f"http://127.0.0.1:8001/api/password_confirm/{uidb64}/{token}/"
+
+    try:
+        send_mail(
+            subject= 'Password reset',
+            message= render_to_string('password_reset.txt', {"link":password_reset_link}),
+            html_message=render_to_string('password_reset.html', {"link":password_reset_link}),
+            from_email= settings.EMAIL_HOST_USER,
+            recipient_list= [receiver]
+        )
+    except Exception as e:
+        print(e)
+        return e
+
+
+
+
+
 # Create username by email prefix
 # If username exist a counter will be added until its unique
 def create_username_from_email(email):
@@ -33,7 +52,6 @@ def create_username_from_email(email):
         counter += 1
 
     return username
-
 
 # Creates base64 String from uid
 def encode_userid(user_id):

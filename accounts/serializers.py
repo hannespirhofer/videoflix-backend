@@ -32,10 +32,10 @@ class ResponseRegisterSerializer(serializers.ModelSerializer):
         fields = ['id', 'email']
 
 
-class ResponseLoginSerializer(serializers.Serializer):
+class ResponseLoginSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserProfile
-        fields = ['avatar', 'has_verified_email']
+        model = User
+        fields = ['id', 'email', 'username']
 
 
 
