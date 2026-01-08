@@ -177,41 +177,34 @@ class ActivateUserView(APIView):
 class RefreshTokenView(APIView):
     def post(self, request, **kwargs):
         try:
-            refresh_token = request.COOKIES.pop('refresh_token')
+            refresh_token = request.COOKIES.get('refresh_token')
             refresh = RefreshToken(refresh_token)
-        except KeyError as e:
+        except Exception as e:
             return Response({
                 'error': 'An error with the token occurred'
             }, status=HTTP_401_UNAUTHORIZED)
 
-        try:
-            user = User.objects.get(id=refresh.get('user_id'))
-        except User.DoesNotExist as e:
-            return Response({
-                'error': 'The user could not be authenticated'
-            }, status=HTTP_400_BAD_REQUEST)
-
-        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
 
         response = Response({
             'detail': 'Token refreshed',
-            'access': str(refresh.access_token),
+            'access': str(access_token),
             }, status=HTTP_200_OK)
 
         response.set_cookie(
             key='access_token',
-            value=str(refresh.access_token),
+            value=str(access_token),
             httponly=True,
             secure=False,
             samesite='Lax'
         )
-        response.set_cookie(
-            key='refresh_token',
-            value=str(refresh),
-            httponly=True,
-            secure=False,
-            samesite='Lax'
-        )
+        # response.set_cookie(
+        #     key='refresh_token',
+        #     value=str(refresh),
+        #     httponly=True,
+        #     secure=False,
+        #     samesite='Lax'
+        # )
 
         return response
 

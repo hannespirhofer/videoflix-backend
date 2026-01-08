@@ -1,6 +1,5 @@
 from rest_framework_simplejwt.authentication import JWTStatelessUserAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken
-import pdb
 
 class CookieJWTAuthentication(JWTStatelessUserAuthentication):
     def authenticate(self, request):
