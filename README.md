@@ -19,17 +19,17 @@ Then follow steps Configuration then Production or Development
 To configure the app please modify .env.template to your needs and rename to .env.
 
 
-``` Enable the following line and disable django dev server in backend.entrypoint.sh if you wish to use gunicorn
+```Enable the following line and disable django dev server in backend.entrypoint.sh if you wish to use gunicorn
 exec gunicorn core.wsgi:application --bind 0.0.0.0:8000
 ```
 
-``` Enable the following line and disable gunicorn and disable gunicorn in backend.entrypoint.sh if you wish to use standard django dev server
+```Enable the following line and disable gunicorn and disable gunicorn in backend.entrypoint.sh if you wish to use standard django dev server
 If you do so you can use pdb to inspect at runtime on web-debug!
 exec python manage.py runserver 0.0.0.0:8000
 ```
 
 Debug with pdb
-``` Open seperate cmd and attach the web-debug container name
+```Open seperate cmd and attach the web-debug container name
 docker attach docker-web-debug-name (find with docker ps)
 ```
 
@@ -54,7 +54,7 @@ Access web-debug: **http://127.0.0.1:8001**
 
 Be sure to update the domain and port of the frontend accordingly for activation emails to work!
 
-``` CORS Error
+```CORS Error
 Add the frontend domain to settings.CORS_ALLOWED_ORIGINS
 ```
 
