@@ -1,8 +1,6 @@
 from rest_framework import serializers
-
 from videos.models import Video
 
-import pdb
 
 class VideoListSerializer(serializers.ModelSerializer):
     thumbnail_url = serializers.SerializerMethodField()

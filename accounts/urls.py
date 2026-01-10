@@ -1,6 +1,6 @@
-from django.urls import include, path
+from django.urls import path
 
-from .views import RegisterView, LoginView, LogoutView, TestView, ActivateUserView, RefreshTokenView, PasswordResetView, PasswordConfirmView
+from accounts.views import RegisterView, LoginView, LogoutView, ActivateUserView, RefreshTokenView, PasswordResetView, PasswordConfirmView
 
 
 urlpatterns = [

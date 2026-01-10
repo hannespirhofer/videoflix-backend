@@ -1,13 +1,13 @@
+from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.template.loader import render_to_string
 
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-import pdb;
 
-def send_register_confirmation(receiver, uidb64, token):
-    activation_link = f"http://127.0.0.1:8001/api/activate/{uidb64}/{token}/"
+def send_register_confirmation(receiver, uidb64, token, host):
+    activation_link = f"http://{host}/api/activate/{uidb64}/{token}/"
 
     try:
         send_mail(
@@ -18,7 +18,6 @@ def send_register_confirmation(receiver, uidb64, token):
             recipient_list= [receiver]
         )
     except Exception as e:
-        print(e)
         return e
 
 def send_password_reset_email(receiver, uidb64, token):
@@ -33,12 +32,7 @@ def send_password_reset_email(receiver, uidb64, token):
             recipient_list= [receiver]
         )
     except Exception as e:
-        print(e)
         return e
-
-
-
-
 
 # Create username by email prefix
 # If username exist a counter will be added until its unique

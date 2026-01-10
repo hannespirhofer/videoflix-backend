@@ -19,4 +19,3 @@ def pre_video_delete(sender, instance, **kwargs):
         instance.file.delete(save=False)
     if instance.thumbnail:
         instance.thumbnail.delete(save=False)
-    #!TODO delete the complete hls_pase_path folder when model gets deleted (or archive it)

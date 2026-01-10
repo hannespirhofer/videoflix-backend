@@ -36,6 +36,10 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", default="localhost").split(",")
 
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", default="http://localhost:4200").split(',')
 
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_TRUSTED_ORIGINS", default="http://localhost:4200").split(',')
+CORS_ALLOW_CREDENTIALS = True
+
+FRONTEND_DOMAIN = os.environ.get("FRONTEND_DOMAIN", default="http://localhost:4200")
 
 # Application definition
 
@@ -206,10 +210,6 @@ EMAIL_HOST_PASSWORD=os.environ.get("EMAIL_HOST_PASSWORD", default="None")
 EMAIL_USE_TLS=os.environ.get("EMAIL_USE_TLS", default="None").lower() == 'true'
 EMAIL_USE_SSL=os.environ.get("EMAIL_USE_SSL", default="None").lower() == 'true'
 DEFAULT_FROM_EMAIL=os.environ.get("DEFAULT_FROM_EMAIL", default="None")
-
-# Allow CORS on development
-CORS_ALLOWED_ORIGINS = ['http://127.0.0.1:5589']
-CORS_ALLOW_CREDENTIALS = True
 
 
 VIDEO_CONVERT_RESOLUTIONS = {

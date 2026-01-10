@@ -1,17 +1,17 @@
-from os import access
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from accounts.models import UserProfile
 from accounts.utils import create_username_from_email, send_password_reset_email, decode_userid, encode_userid, send_register_confirmation
 from django.contrib.auth.models import User
 from django_rq import enqueue
-from django.db import IntegrityError, transaction
-import pdb
+from django.db import transaction
+from django.shortcuts import redirect
 
 from .serializers import ResponseRegisterSerializer, RequestRegisterSerializer, RequestLoginSerializer, ResponseLoginSerializer
 
@@ -33,7 +33,6 @@ class RegisterView(APIView):
             return Response({'error': 'Passwords do not match'}, status=400)
 
         if User.objects.filter(email=email).exists():
-            print(f"2. Email {email} already exists!")
             return Response('Email already in use.', status=HTTP_400_BAD_REQUEST)
 
         if not username:
@@ -42,24 +41,20 @@ class RegisterView(APIView):
         try: # Create the user or abort
             with transaction.atomic():
 
-                print(f"4. About to create user with email='{email}', username='{username}'")
                 user = User.objects.create_user(email=email, password=password, username=username)
-                print(f"5. Created user with ID: {user.id}")
 
                 user_profile = user.user_profile
-                print(f"6. User {user.id} 's profile has the id: {user_profile.id}!")
 
                 res = ResponseRegisterSerializer(user.user_profile)
                 [token, created] = Token.objects.get_or_create(user = user)
 
-                job = enqueue(send_register_confirmation,user.email,encode_userid(user_profile.id),token)
+                job = enqueue(send_register_confirmation,user.email,encode_userid(user_profile.id),token, request.get_host())
 
                 return Response({
                     'user': {**res.data},
                     'token': token.key
                 }, status=HTTP_201_CREATED)
         except Exception as e:
-            print(e)
             return Response({'error': 'Registration failed'}, status=HTTP_400_BAD_REQUEST)
 
 
@@ -69,6 +64,9 @@ class LoginView(APIView):
         password = request.data.get('password', None)
         bypass = request.data.get('bypass_key') == 'pigeon';
 
+        if (settings.DEBUG):
+            bypass = False
+
         serializer = RequestLoginSerializer(data=request.data)
         serializer.is_valid()
 
@@ -76,7 +74,7 @@ class LoginView(APIView):
             user = User.objects.get(email = email)
         except Exception as e:
             return Response(
-                {'error': 'User not found'},
+                {'error': 'User not found', 'other': request.get_host()},
                 status = HTTP_400_BAD_REQUEST
             )
 
@@ -166,12 +164,13 @@ class ActivateUserView(APIView):
         user_profile.has_verified_email=True
         user_profile.save()
 
-        [token, created] = Token.objects.get_or_create(user = user_profile.user)
+        # [token, created] = Token.objects.get_or_create(user = user_profile.user)
 
-        response = Response({ 'message': 'Account successfully activated.'},status=HTTP_200_OK)
-        response.set_cookie('access-token', token)
-        response.set_cookie('refresh-token', token)
-        return response
+        # response = Response({ 'message': 'Account successfully activated.'},status=HTTP_200_OK)
+        # response.set_cookie('access-token', token)
+        # response.set_cookie('refresh-token', token)
+        # return response
+        return redirect(f'{settings.FRONTEND_DOMAIN}/pages/auth/login.html?activated=true')
 
 
 class RefreshTokenView(APIView):
@@ -265,18 +264,5 @@ class PasswordConfirmView(APIView):
         user.save()
 
         return Response({"detail": "Your Password has been successfully reset."}, HTTP_200_OK)
-
-
-
-class TestView(APIView):
-
-    def post(self, request):
-        userprofile = UserProfile.objects.get(user__email='pirhofer.hannes88@gmail.com')
-        [token, created] = Token.objects.get_or_create(user = userprofile.user)
-        res = ResponseRegisterSerializer(userprofile)
-        return Response({
-            'user': {**res.data},
-            'token': token.key
-        }, status=HTTP_201_CREATED)
 
 

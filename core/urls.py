@@ -4,7 +4,6 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from debug_toolbar.toolbar import debug_toolbar_urls
 
-from accounts.views import TestView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,12 +13,8 @@ urlpatterns = [
     path('api/', include('accounts.urls')),
 
     # Video related Urls
-    path('api/', include('videos.urls')),
-
-    # test purpose
-    path('test/', TestView.as_view(), name='test')
+    path('api/', include('videos.urls'))
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
