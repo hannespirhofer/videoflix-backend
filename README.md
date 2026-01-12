@@ -74,3 +74,9 @@ Add the frontend domain to settings.CORS_ALLOWED_ORIGINS
 - DjangoRq - Queue Manager
 - ffmpeg for video convertion
 - HSTS Video Format for optimized buffering
+
+
+Done
+
+Cookies löschen bei Logout
+401 Fehler statt 400 bei Login

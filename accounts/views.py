@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -48,7 +49,7 @@ class RegisterView(APIView):
                 res = ResponseRegisterSerializer(user.user_profile)
                 [token, created] = Token.objects.get_or_create(user = user)
 
-                job = enqueue(send_register_confirmation,user.email,encode_userid(user_profile.id),token, request.get_host())
+                job = enqueue(send_register_confirmation,user.email,encode_userid(user_profile.id),username,token)
 
                 return Response({
                     'user': {**res.data},
@@ -74,14 +75,14 @@ class LoginView(APIView):
             user = User.objects.get(email = email)
         except Exception as e:
             return Response(
-                {'error': 'User not found', 'other': request.get_host()},
-                status = HTTP_400_BAD_REQUEST
+                {'error': 'User not found'},
+                status = HTTP_401_UNAUTHORIZED
             )
 
         if not user.user_profile.has_verified_email and not bypass:
             return Response(
                 {'error': 'Please verify your email first'},
-                status = HTTP_400_BAD_REQUEST
+                status = HTTP_401_UNAUTHORIZED
             )
 
         is_pwd_ok = user.check_password(password)
@@ -89,7 +90,7 @@ class LoginView(APIView):
         if not is_pwd_ok:
             return Response(
                 {'error': 'Login failed!'},
-                status = HTTP_400_BAD_REQUEST
+                status = HTTP_401_UNAUTHORIZED
             )
 
         # [token, created] = Token.objects.get_or_create(user = user)
@@ -134,24 +135,40 @@ class LogoutView(APIView):
                 'error': 'An error with the token occurred'
             }, status=HTTP_400_BAD_REQUEST)
 
-        return Response({
+        response = Response({
             'detail': 'Logout successful! All tokens will be deleted. Refresh token is now invalid.'
         })
+        response.set_cookie(
+            key='access_token',
+            value='',
+            expires=datetime.now(),
+            httponly=True,
+            secure=False,
+            samesite='Lax'
+        )
+        response.set_cookie(
+            key='refresh_token',
+            value='',
+            expires=datetime.now(),
+            httponly=True,
+            secure=False,
+            samesite='Lax'
+        )
+        return response
 
 
 class ActivateUserView(APIView):
     def get(self, request, **kwargs):
         try:
             uidb64 = kwargs.pop('uidb64')
-            token = kwargs.pop('token')
         except KeyError as e:
             return Response({
                 'error': 'Request not valid - try again'
-            }, status=HTTP_400_BAD_REQUEST)
+            }, status=HTTP_401_UNAUTHORIZED)
 
 
         try:
-            userid = int(decode_userid(uidb64));
+            userid = int(decode_userid(uidb64))
         except Exception as e:
             return Response({'error': 'Activation failed. The link is not valid.'}, status=HTTP_400_BAD_REQUEST)
 
@@ -164,13 +181,9 @@ class ActivateUserView(APIView):
         user_profile.has_verified_email=True
         user_profile.save()
 
-        # [token, created] = Token.objects.get_or_create(user = user_profile.user)
 
-        # response = Response({ 'message': 'Account successfully activated.'},status=HTTP_200_OK)
-        # response.set_cookie('access-token', token)
-        # response.set_cookie('refresh-token', token)
-        # return response
-        return redirect(f'{settings.FRONTEND_DOMAIN}/pages/auth/login.html?activated=true')
+        response = Response({ 'message': 'Account successfully activated.'},status=HTTP_200_OK)
+        return response
 
 
 class RefreshTokenView(APIView):
@@ -224,7 +237,7 @@ class PasswordResetView(APIView):
                 }, HTTP_401_UNAUTHORIZED)
 
         [token, created] = Token.objects.get_or_create(user=user)
-        job = enqueue(send_password_reset_email,user.email,encode_userid(user.user_profile.id),token)
+        job = enqueue(send_password_reset_email,user.email,encode_userid(user.user_profile.id),user.username,token)
 
         return Response( {
                 "detail": "An email has been sent to reset your password."

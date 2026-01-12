@@ -5,3 +5,9 @@ static
 .idea
 # Ignores all files with "ignore" in the filename
 *.ignore.*
+
+
+# Only for Development only
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py

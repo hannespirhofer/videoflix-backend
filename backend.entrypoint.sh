@@ -40,7 +40,7 @@ EOF
 
 python manage.py rqworker default &
 
-#DEBUG
+# DEBUG
 # exec python manage.py runserver 0.0.0.0:8000
 # Production
 exec gunicorn core.wsgi:application --bind 0.0.0.0:8000
