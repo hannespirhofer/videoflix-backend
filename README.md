@@ -36,9 +36,9 @@ Django-based video streaming platform with HLS transcoding and background task p
 Required:
 
 - Email configuration
-- Frontend domain (CORS)
-- Frontend domain (CSRF)
-- Frontend URL (CSRF)
+- Frontend domain (CORS ORIGINS)
+- Frontend domain (CSRF ORIGINS)
+- Frontend URL
 
 Optional:
 
