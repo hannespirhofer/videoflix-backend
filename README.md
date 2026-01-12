@@ -32,12 +32,16 @@ Django-based video streaming platform with HLS transcoding and background task p
 ## Configuration
 
 Edit `.env` file with required settings:
+
 Required:
+
 - Email configuration
 - Frontend domain (CORS)
 - Frontend domain (CSRF)
 - Frontend URL (CSRF)
+
 Optional:
+
 - Database credentials
 - Django secret key
 
