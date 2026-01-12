@@ -9,8 +9,9 @@ from .utils import process_video, create_thumbnail
 #Mux the video
 @receiver(post_save, sender=Video)
 def on_video_save(sender, instance, created, **kwargs):
-    if created and not instance.thumbnail:
-        job = enqueue(create_thumbnail,instance.id)
+    if created:
+        if not instance.thumbnail:
+            job = enqueue(create_thumbnail,instance.id)
         job = enqueue(process_video,instance.id)
 
 @receiver(pre_delete, sender=Video)

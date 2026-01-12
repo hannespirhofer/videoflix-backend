@@ -5,7 +5,7 @@ from django.db import models
 class Video(models.Model):
     title = models.CharField(max_length=200, blank=False)
     description = models.TextField(blank=True, null=True)
-    category = models.CharField(max_length=200, blank=True, null=True)
+    category = models.CharField(max_length=200, blank=False, null=False, default="Default Category")
     thumbnail = models.FileField(upload_to="thumbnails/", editable=True, blank=True, null=True, help_text="If not provided a thumbnail will be generated automatically from the video source")
     file = models.FileField(upload_to="videos/", blank=False, default='', verbose_name='Original Video File')
     created_at = models.DateTimeField(auto_now_add=True)

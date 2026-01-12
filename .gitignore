@@ -7,7 +7,6 @@ static
 *.ignore.*
 
 
-# Only for Development only
-**/migrations/**
-!**/migrations
+**/migrations/*
+!**/migrations/
 !**/migrations/__init__.py

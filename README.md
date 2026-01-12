@@ -1,82 +1,78 @@
-# videoflix-backend
+# Videoflix Backend
+
+Django-based video streaming platform with HLS transcoding and background task processing.
 
 ## Requirements
-```
-(Python), (pip), Docker
+
+- Docker
+- Docker Compose
+
+## Quick Start
+
+1. Clone the repository
+```bash
+   git clone <repository-url>
+   cd videoflix-backend
 ```
 
-## Frontend Repo
-```
-git@github.com:Developer-Akademie-Backendkurs/project.Videoflix.git
+2. Configure environment (Copy .env.template to .env(create new file))
+```bash
+   cp .env.template .env
+   # The .env is needed to run your project configuraiton and docker build to succeed
 ```
 
-## Installation
-Clone the repo and open terminal inside.
-Then follow steps Configuration then Production or Development
+3. Build and run
+```bash
+   docker compose up web --build
+```
 
+4. Access the application
+   - Admin panel: http://127.0.0.1:8000/admin
 
 ## Configuration
-To configure the app please modify .env.template to your needs and rename to .env.
 
-Enable the following line and disable django dev server in backend.entrypoint.sh if you wish to use gunicorn
-```
-exec gunicorn core.wsgi:application --bind 0.0.0.0:8000
+Edit `.env` file with required settings:
+Required:
+- Email configuration
+- Frontend domain (CORS)
+- Frontend domain (CSRF)
+- Frontend URL (CSRF)
+Optional:
+- Database credentials
+- Django secret key
+
+## Tech Stack
+
+- Django REST Framework
+- PostgreSQL
+- Redis + django-rq
+- FFmpeg (HLS video transcoding)
+- Gunicorn
+- Docker
+
+## Frontend Repository
+```bash
+git clone git@github.com:Developer-Akademie-Backendkurs/project.Videoflix.git
 ```
 
-Enable the following line and disable gunicorn and disable gunicorn in backend.entrypoint.sh if you wish to use standard django dev server
-If you do so you can use pdb to inspect at runtime on web-debug!
+---
+
+## Optional: Development
+
+### Debug Container
+```bash
+docker compose up web-debug --build
+# Access at http://127.0.0.1:8001
 ```
+
+### Django Development Server (needed for interactive debugging)
+Modify `backend.entrypoint.sh`:
+```bash
 exec python manage.py runserver 0.0.0.0:8000
 ```
 
-### Debug with pdb
-
-Open seperate cmd and attach the web-debug container name
+### Interactive Debugging Activation in terminal
+```bash
+docker attach <web-debug-container-name>
+# Add in code: import pdb; pdb.set_trace()
 ```
-docker attach docker-web-debug-name (find with docker ps)
-```
-
-Then debug the code
-import pdb
-pdb.set_trace()
-
-
-## Build and run the Service
-web: the standard one
-web-debug: the debug one
-
-Build and run the production version
-```
-docker compose build web|web-debug --build
-```
-
-Access web: **http://127.0.0.1:8000**
-Access web-debug: **http://127.0.0.1:8001**
-
-
-## Notes
-
-Be sure to update the domain and port of the frontend accordingly for activation emails to work!
-
-CORS
-```
-Add the frontend domain to settings.CORS_ALLOWED_ORIGINS
-```
-
-
-## Tech stack:
-- Python 3
-- Django
-- Docker - containerization
-- Postresql - db
-- Gunicorn - NGINX wsgi http server
-- Redis - caching layer
-- DjangoRq - Queue Manager
-- ffmpeg for video convertion
-- HSTS Video Format for optimized buffering
-
-
-Done
-
-Cookies löschen bei Logout
-401 Fehler statt 400 bei Login
