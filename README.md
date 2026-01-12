@@ -31,7 +31,7 @@ Django-based video streaming platform with HLS transcoding and background task p
 
 ## Configuration
 
-Edit `.env` file with required settings:
+**Edit `.env` file - REQUIRED**
 
 Required:
 
