@@ -1,9 +1,11 @@
+from unicodedata import category
 from rest_framework import serializers
 from videos.models import Video
 
 
 class VideoListSerializer(serializers.ModelSerializer):
     thumbnail_url = serializers.SerializerMethodField()
+    category = serializers.CharField(source="category.name", read_only=True)
 
     def get_thumbnail_url(self, obj):
         request = self.context.get('request')

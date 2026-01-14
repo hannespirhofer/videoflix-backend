@@ -44,3 +44,5 @@ python manage.py rqworker default &
 # exec python manage.py runserver 0.0.0.0:8000
 # Production
 exec gunicorn core.wsgi:application --bind 0.0.0.0:8000
+# Activate to stdout gunicorn logs
+# exec gunicorn core.wsgi:application --log-level debug --access-logfile - --error-logfile - --bind 0.0.0.0:8000
